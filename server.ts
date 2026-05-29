@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
@@ -76,6 +77,21 @@ async function startServer() {
     
     if (!text && !videoId) {
       return res.status(400).json({ error: "Sermon text or videoId is required" });
+    }
+
+    const dataPath = path.join(process.cwd(), "src", "data", "latest-sermon.json");
+    
+    // Na nuvem (produção), nós apenas lemos o arquivo salvo para evitar bloqueios!
+    if (process.env.NODE_ENV === "production") {
+      try {
+        if (fs.existsSync(dataPath)) {
+          console.log("Serving pre-generated sermon on production.");
+          const fileData = fs.readFileSync(dataPath, "utf-8");
+          return res.json(JSON.parse(fileData));
+        }
+      } catch (e) {
+        console.error("Error reading saved sermon", e);
+      }
     }
 
     try {
@@ -186,6 +202,19 @@ O formato exato em JSON deve ser:
 
       const responseText = response.text || "";
       const parsed = JSON.parse(responseText.trim());
+      
+      // Salva localmente se estiver no ambiente de desenvolvimento
+      if (process.env.NODE_ENV !== "production") {
+        try {
+          const dir = path.dirname(dataPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(dataPath, JSON.stringify(parsed, null, 2));
+          console.log(`Saved latest generated sermon to ${dataPath}`);
+        } catch (e) {
+          console.error("Failed to save sermon locally:", e);
+        }
+      }
+
       return res.json(parsed);
 
     } catch (error: any) {

@@ -109,7 +109,7 @@ export default function App() {
                 <div className="flex items-center justify-between">
                   <h3 className="font-sans font-bold text-xs text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                     <Tv className="w-4 h-4 text-[#3b82f6]" />
-                    Transmissão Ao Vivo
+                    Mensagem da Semana
                   </h3>
                 </div>
                 <LiveStream />
