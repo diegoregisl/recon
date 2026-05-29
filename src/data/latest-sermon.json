@@ -1,0 +1,62 @@
+{
+  "linha_do_tempo": [
+    {
+      "fase": "Abertura e Testemunho",
+      "descricao": "Abertura com oração e testemunho de Vanessa baseado em Salmos 69:33 sobre a providência divina na viagem de sua irmã."
+    },
+    {
+      "fase": "Momento de Louvor",
+      "descricao": "Período de adoração congregacional com cânticos ao Espírito Santo, além de Hosana nas Alturas e Grande é o Nome do Senhor."
+    },
+    {
+      "fase": "Dízimos e Ofertas",
+      "descricao": "Breve reflexão e consagração dos dízimos e ofertas, com foco no princípio bíblico da gratidão e do senhorio de Cristo."
+    },
+    {
+      "fase": "Oração pelas Famílias",
+      "descricao": "Momento de intercessão em círculo clâmando por cura, libertação de vícios e restauração dos lares, entoando a canção Deus de Milagres."
+    },
+    {
+      "fase": "Pregação da Palavra",
+      "descricao": "Mensagem principal baseada em Atos 16:31-34 sobre o tema das famílias salvas na Bíblia, citando os exemplos de Noé, Ló, Eli, Páscoa, Raabe e o carcereiro de Filipos."
+    },
+    {
+      "fase": "Avisos e Encerramento",
+      "descricao": "Comunicações sobre o Desafio Jovem, Jantar de Casais e Acampamento GPS, seguidos pela oração de encerramento e bênção apostólica."
+    }
+  ],
+  "carrossel": [
+    {
+      "slide_numero": 1,
+      "titulo": "Salvação Para Sua Casa",
+      "texto": "Deus não deseja resgatar apenas você, mas estender a Sua graça salvadora a todo o seu lar."
+    },
+    {
+      "slide_numero": 2,
+      "titulo": "O Legado de Noé",
+      "texto": "Pela fé e obediência fiel, Noé preparou a arca que salvou toda a sua família da destruição."
+    },
+    {
+      "slide_numero": 3,
+      "titulo": "Protegidos Pelo Sangue Santo",
+      "texto": "Na Páscoa, a cobertura do sangue do cordeiro guardou as famílias, apontando para o sacrifício de Jesus."
+    },
+    {
+      "slide_numero": 4,
+      "titulo": "Uma Fé que Alcança",
+      "texto": "Do carcereiro de Filipos ao centurião Cornélio, quando o cabeça do lar crê, a salvação entra na casa."
+    },
+    {
+      "slide_numero": 5,
+      "titulo": "Decisão de se Posicionar",
+      "texto": "Siga o exemplo de Josué e firme um compromisso eterno: Eu e a minha casa serviremos ao Senhor."
+    }
+  ],
+  "devocional": {
+    "titulo": "O Projeto Divino da Salvação Familiar",
+    "versiculo_base": "Atos 16:31",
+    "reflexao": "O plano de redenção estabelecido por Deus nunca foi individualista. Desde a aliança com Abraão, passando pela arca de Noé até a cobertura do cordeiro pascal nas casas no Egito, o Senhor sempre revelou Seu coração focado em abençoar a família como um todo. Quando entregamos nossa vida a Cristo, tornamo-nos canais de bênção para que a luz do Evangelho alcance e dissipe as trevas que tentam assolar os nossos lares. Na caminhada prática, assumir a responsabilidade espiritual pela nossa casa é um chamado inegociável. A herança de fé que deixamos para as próximas gerações depende de nosso posicionamento em oração e obediência. Como vemos na história de Raabe e do carcereiro de Filipos, a conversão e o temor de uma só pessoa podem abrir as portas da salvação e mudar o destino de toda uma parentela. Portanto, continue perseverando em favor daqueles que você ama, mesmo quando as circunstâncias parecerem difíceis. A promessa de salvação para a sua casa é uma âncora de esperança. Firme os seus pés na verdade bíblica, exerça a autoridade espiritual no seu lar e confie no poder restaurador do Espírito Santo, que é poderoso para fazer infinitamente mais do que pedimos ou pensamos.",
+    "oracao_guiada": "Senhor Deus, coloco a minha família em Teu altar. Fortalece a minha fé para que eu continue intercedendo pela salvação e libertação de cada um dos meus entes queridos. Que o Teu Espírito traga cura e restauração sobre o meu lar. Declaramos que eu e a minha casa serviremos ao Senhor. Amém."
+  },
+  "legenda_instagram": "Deus tem um plano perfeito de salvação e restauração para a sua família! No culto deste domingo, fomos profundamente ministrados de que a promessa de Atos 16:31 se estende a todos os nossos entes queridos. Da arca de Noé à casa do carcereiro de Filipos, a graça de Deus sempre busca resgatar lares inteiros através de uma fé ativa e obediente. Não importa quão difíceis pareçam as lutas em sua casa hoje, o Senhor é o Deus de milagres e poderoso para transformar a sua história. Continue orando e se posicionando espiritualmente! Pergunta para meditarmos juntos: qual o nome daquele familiar que você está apresentando a Deus em oração nesta semana? Escreva aqui nos comentários para intercedermos juntos por ele! #IgrejaRecon #MinisterioDaReconciliacao #SalvaçãoFamiliar #Fé #OraçãoPelaFamília #DeusDeMilagres"
+}
