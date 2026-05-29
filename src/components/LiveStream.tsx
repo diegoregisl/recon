@@ -34,7 +34,7 @@ export default function LiveStream() {
     // Atualiza a cada 5 minutos
     const interval = setInterval(fetchLiveStream, 300000);
     return () => clearInterval(interval);
-  }, [API_KEY, CHANNEL_ID]);
+  }, []);
 
   const handleGenerateSummary = async () => {
     if (!liveVideoId) return;
