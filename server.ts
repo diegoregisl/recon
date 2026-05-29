@@ -33,6 +33,43 @@ async function startServer() {
     return aiClient;
   }
 
+  // API Route: Get Live Video ID safely from server
+  app.get("/api/live-video", async (req, res) => {
+    const API_KEY = process.env.VITE_YOUTUBE_API_KEY;
+    const CHANNEL_ID = process.env.VITE_YOUTUBE_CHANNEL_ID;
+    
+    if (!API_KEY || !CHANNEL_ID) {
+      console.warn("YouTube keys missing on server.");
+      return res.json({ videoId: "3ACwaoXbKVc" }); // fallback
+    }
+
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.items && data.items.length > 0) {
+        return res.json({ videoId: data.items[0].id.videoId });
+      }
+
+      // Fallback: Last video
+      const fallbackRes = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&order=date&type=video&maxResults=1&key=${API_KEY}`
+      );
+      const fallbackData = await fallbackRes.json();
+      
+      if (fallbackData.items && fallbackData.items.length > 0) {
+        return res.json({ videoId: fallbackData.items[0].id.videoId });
+      }
+
+      return res.json({ videoId: "3ACwaoXbKVc" }); // ultimate fallback
+    } catch (error) {
+      console.error("YouTube API error on server:", error);
+      return res.json({ videoId: "3ACwaoXbKVc" });
+    }
+  });
+
   // API Route: Analyze Sermon
   app.post("/api/analyze-sermon", async (req, res) => {
     let { text, videoId, vibe } = req.body;

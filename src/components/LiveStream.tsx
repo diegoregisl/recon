@@ -10,54 +10,20 @@ export default function LiveStream() {
   const [aiSummary, setAiSummary] = useState<any>(null);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
-  const CHANNEL_ID = import.meta.env.VITE_YOUTUBE_CHANNEL_ID;
-
   useEffect(() => {
     const fetchLiveStream = async () => {
       try {
-        if (!API_KEY || !CHANNEL_ID) {
-          console.error("YouTube API Key ou Channel ID ausente nas variáveis de ambiente.");
-          setLoading(false);
-          return;
-        }
-
-        // Busca por transmissões ao vivo atuais
-        const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`
-        );
+        const response = await fetch("/api/live-video");
         const data = await response.json();
-
-        // Se a cota da API acabar (Erro 403 ou 429), usamos um vídeo fixo para o app não quebrar
-        if (data.error) {
-          console.error("Erro na API do YouTube (Cota excedida?):", data.error.message);
-          setLiveVideoId("3ACwaoXbKVc"); // Vídeo de teste (último culto)
-          return;
-        }
-
-        if (data.items && data.items.length > 0) {
-          setLiveVideoId(data.items[0].id.videoId);
+        
+        if (data.videoId) {
+          setLiveVideoId(data.videoId);
         } else {
-          // Se não houver live, buscar o último vídeo do canal como fallback
-          const fallbackRes = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&order=date&type=video&maxResults=1&key=${API_KEY}`
-          );
-          const fallbackData = await fallbackRes.json();
-          
-          if (fallbackData.error) {
-            console.error("Erro na API do YouTube (Fallback):", fallbackData.error.message);
-            setLiveVideoId("3ACwaoXbKVc"); // Vídeo de teste
-            return;
-          }
-
-          if (fallbackData.items && fallbackData.items.length > 0) {
-            setLiveVideoId(fallbackData.items[0].id.videoId);
-          } else {
-            setLiveVideoId("3ACwaoXbKVc"); // Segurança extra
-          }
+          setLiveVideoId("3ACwaoXbKVc");
         }
       } catch (error) {
-        console.error("Erro ao buscar dados do YouTube:", error);
+        console.error("Erro ao buscar dados do YouTube via servidor:", error);
+        setLiveVideoId("3ACwaoXbKVc");
       } finally {
         setLoading(false);
       }
