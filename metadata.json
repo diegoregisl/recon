@@ -1,0 +1,6 @@
+{
+  "name": "RECON",
+  "description": "Plataforma digital para a Igreja Batista Ministério da Reconciliação (RECON). Inclui transmissão ao vivo, pedidos de oração, dízimos e ofertas, agenda de cultos e painel de análise teológica de sermões.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
