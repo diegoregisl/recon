@@ -1,12 +1,57 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import os from "os";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
+import ytdlp from "yt-dlp-exec";
 import { YoutubeTranscript } from "youtube-transcript";
+import { Storage } from "@google-cloud/storage";
 
 dotenv.config();
+
+const storage = new Storage();
+const GCS_BUCKET_NAME = process.env.GCS_BUCKET_NAME || "recon-sermon-data";
+const LATEST_SERMON_FILE = "latest-sermon.json";
+
+async function saveSermon(parsedData: any) {
+  const dataPath = path.join(process.cwd(), "src", "data", LATEST_SERMON_FILE);
+  if (process.env.NODE_ENV === "production" && process.env.GCS_BUCKET_NAME) {
+     try {
+       await storage.bucket(GCS_BUCKET_NAME).file(LATEST_SERMON_FILE).save(JSON.stringify(parsedData, null, 2));
+       console.log("Saved sermon to Google Cloud Storage");
+     } catch(e) { console.error("Error saving to GCS", e); }
+  } else {
+     try {
+       const dir = path.dirname(dataPath);
+       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+       fs.writeFileSync(dataPath, JSON.stringify(parsedData, null, 2));
+       console.log(`Saved locally to ${dataPath}`);
+     } catch(e) { console.error("Error saving locally", e); }
+  }
+}
+
+async function getSavedSermon() {
+  const dataPath = path.join(process.cwd(), "src", "data", LATEST_SERMON_FILE);
+  if (process.env.NODE_ENV === "production" && process.env.GCS_BUCKET_NAME) {
+     try {
+       const file = storage.bucket(GCS_BUCKET_NAME).file(LATEST_SERMON_FILE);
+       const [exists] = await file.exists();
+       if (exists) {
+         const [content] = await file.download();
+         return JSON.parse(content.toString());
+       }
+     } catch(e) { console.error("Error reading from GCS", e); }
+  } else {
+     try {
+       if (fs.existsSync(dataPath)) {
+         return JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+       }
+     } catch(e) { console.error("Error reading local", e); }
+  }
+  return null;
+}
 
 async function startServer() {
   const app = express();
@@ -20,7 +65,7 @@ async function startServer() {
     if (!aiClient) {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        console.warn("WARNING: GEMINI_API_KEY is not defined. AI sermon analysis will run in high-quality dynamic simulation mode.");
+        console.warn("WARNING: GEMINI_API_KEY is not defined.");
       }
       aiClient = new GoogleGenAI({
         apiKey: apiKey || "MOCK_KEY",
@@ -71,70 +116,67 @@ async function startServer() {
     }
   });
 
-  // API Route: Analyze Sermon
-  app.post("/api/analyze-sermon", async (req, res) => {
-    let { text, videoId, vibe } = req.body;
-    
-    if (!text && !videoId) {
-      return res.status(400).json({ error: "Sermon text or videoId is required" });
-    }
+  async function generateSermonAnalysisCore(videoId: string, text?: string, vibe?: string) {
+      let tempAudioPath: string | null = null;
+      let uploadedFileRef: any = null;
+      const client = getGeminiClient();
 
-    const dataPath = path.join(process.cwd(), "src", "data", "latest-sermon.json");
-    
-    // Na nuvem (produção), nós apenas lemos o arquivo salvo para evitar bloqueios!
-    if (process.env.NODE_ENV === "production") {
-      try {
-        if (fs.existsSync(dataPath)) {
-          console.log("Serving pre-generated sermon on production.");
-          const fileData = fs.readFileSync(dataPath, "utf-8");
-          return res.json(JSON.parse(fileData));
-        }
-      } catch (e) {
-        console.error("Error reading saved sermon", e);
-      }
-    }
-
-    try {
       if (videoId) {
         try {
           console.log(`Fetching transcript for videoId: ${videoId}`);
           const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-          text = transcript.map(t => t.text).join(" ");
+          text = transcript.map((t: any) => t.text).join(" ");
           console.log(`Extracted ${text.length} characters from transcript.`);
         } catch (err: any) {
-          console.error("Error fetching transcript:", err.message);
-          console.log("Falling back to mock generator because transcript is unavailable.");
-          return res.json(getMockSermonResponse("fé tempestade paz confiança amor", vibe));
+          console.error("Error fetching transcript, falling back to deep audio extraction:", err.message);
         }
       }
+      
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        console.log("Using local mock sermon generator due to empty/placeholder key.");
-        return res.json(getMockSermonResponse(text, vibe));
+        throw new Error("A chave da API do Gemini não está configurada.");
       }
 
-      const client = getGeminiClient();
-      const prompt = `Analise a transcrição completa do culto fornecida abaixo.
-      A transcrição contém o culto inteiro (abertura, louvores, avisos, orações iniciais e a pregação).
-      
-      SUA TAREFA:
-      1. Faça um resumo cronológico detalhado do culto inteiro. Divida em fases (Abertura, Louvores, Orações, Avisos, Pregação, Apelo/Encerramento). Identifique, se possível, quais músicas foram tocadas, motivos de oração e quem falou.
-      2. Depois, isole especificamente o momento da "Pregação/Mensagem" principal (geralmente introduzida pelo pastor) e extraia os materiais teológicos EXCLUSIVAMENTE baseados nessa pregação central (Devocional, Carrossel e Legenda).
-      
-      O tom de voz deve ser edificante, bíblico, claro, acolhedor e focado em aplicação prática para o dia a dia.
-      
-      Estilo/Vibe solicitado: ${vibe || "Equilibrado, profundo e prático"}
+      if (videoId && (!text || text.trim() === "")) {
+         tempAudioPath = path.join(os.tmpdir(), `audio_${videoId}_${Date.now()}.m4a`);
+         console.log(`Starting yt-dlp audio download for ${videoId} to ${tempAudioPath}`);
+         try {
+           await ytdlp(`https://www.youtube.com/watch?v=${videoId}`, {
+             extractAudio: true,
+             audioFormat: "m4a",
+             output: tempAudioPath,
+           });
+           console.log(`Download finished, uploading to Gemini...`);
+           
+           uploadedFileRef = await client.files.upload({ file: tempAudioPath, config: { mimeType: "audio/m4a" } });
+           console.log(`Upload to Gemini complete: ${uploadedFileRef.name}`);
+         } catch(dlErr: any) {
+           console.error("Error in audio extraction:", dlErr);
+           throw new Error("Falha ao extrair áudio do YouTube para análise profunda. Talvez o vídeo seja restrito ou longo demais.");
+         }
+      }
 
-      Transcrição do Culto:
-      """
-      ${text}
-      """`;
+      try {
+          const prompt = `Analise o culto fornecido.
+          O arquivo de áudio (se anexado) ou a transcrição abaixo contém o culto inteiro (abertura, louvores, avisos, orações iniciais e a pregação).
+          
+          SUA TAREFA:
+          1. Faça um resumo cronológico detalhado do culto inteiro. Divida em fases (Abertura, Louvores, Orações, Avisos, Pregação, Apelo/Encerramento). Identifique, se possível, quais músicas foram tocadas, motivos de oração e quem falou.
+          2. Depois, isole especificamente o momento da "Pregação/Mensagem" principal (geralmente introduzida pelo pastor) e extraia os materiais teológicos EXCLUSIVAMENTE baseados nessa pregação central (Devocional, Carrossel e Legenda).
+          
+          O tom de voz deve ser edificante, bíblico, claro, acolhedor e focado em aplicação prática para o dia a dia.
+          
+          Estilo/Vibe solicitado: ${vibe || "Equilibrado, profundo e prático"}
 
-      const response = await client.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
-        config: {
-          systemInstruction: `Você é o assistente pastoral e diretor de mídia da Igreja Batista Ministério da Reconciliação (RECON).
+          ${text ? `Transcrição do Culto:\n"""\n${text}\n"""` : `(O áudio do culto foi fornecido em anexo. Por favor, ouça-o com atenção.)`}`;
+
+          const contentsPart: any = uploadedFileRef ? [uploadedFileRef, prompt] : prompt;
+
+          const response = await client.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: contentsPart,
+            config: {
+              systemInstruction: `Você é o assistente pastoral e diretor de mídia da Igreja Batista Ministério da Reconciliação (RECON).
 Sua missão é extrair um cronograma detalhado do culto e focar estritamente na PREGAÇÃO PRINCIPAL para gerar os materiais de rede social.
 Você deve retornar exclusivamente um objeto JSON válido, sem qualquer tipo de markdown ou texto adicional ao ao redor do JSON.
 O formato exato em JSON deve ser:
@@ -154,69 +196,102 @@ O formato exato em JSON deve ser:
   },
   "legenda_instagram": "Uma legenda engajadora para o carrossel, incluindo uma pergunta instigante como chamada para ação (CTA) e obrigatoriamente as hashtags #IgrejaRecon #MinisterioDaReconciliacao"
 }`,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              linha_do_tempo: {
-                type: Type.ARRAY,
-                description: "Um cronograma resumindo o culto inteiro dividido em fases/partes cronológicas.",
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    fase: { type: Type.STRING, description: "Nome da parte do culto (ex: Abertura, Momento de Louvor, Avisos, Ofertório, Pregação, Apelo, Encerramento)." },
-                    descricao: { type: Type.STRING, description: "Resumo rico do que aconteceu nesta fase (cite nomes de louvores reconhecidos no texto, temas das orações, quem pregou, etc)." }
-                  },
-                  required: ["fase", "descricao"]
-                }
-              },
-              carrossel: {
-                type: Type.ARRAY,
-                description: "Array of exactly 4 to 6 slides representing progressive theological highlights from the sermon to compose an Instagram post.",
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    slide_numero: { type: Type.INTEGER },
-                    titulo: { type: Type.STRING },
-                    texto: { type: Type.STRING }
-                  },
-                  required: ["slide_numero", "titulo", "texto"]
-                }
-              },
-              devocional: {
+              responseMimeType: "application/json",
+              responseSchema: {
                 type: Type.OBJECT,
                 properties: {
-                  titulo: { type: Type.STRING },
-                  versiculo_base: { type: Type.STRING },
-                  reflexao: { type: Type.STRING },
-                  oracao_guiada: { type: Type.STRING }
+                  linha_do_tempo: {
+                    type: Type.ARRAY,
+                    description: "Um cronograma resumindo o culto inteiro dividido em fases/partes cronológicas.",
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        fase: { type: Type.STRING, description: "Nome da parte do culto (ex: Abertura, Momento de Louvor, Avisos, Ofertório, Pregação, Apelo, Encerramento)." },
+                        descricao: { type: Type.STRING, description: "Resumo rico do que aconteceu nesta fase (cite nomes de louvores reconhecidos no texto, temas das orações, quem pregou, etc)." }
+                      },
+                      required: ["fase", "descricao"]
+                    }
+                  },
+                  carrossel: {
+                    type: Type.ARRAY,
+                    description: "Array of exactly 4 to 6 slides representing progressive theological highlights from the sermon to compose an Instagram post.",
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        slide_numero: { type: Type.INTEGER },
+                        titulo: { type: Type.STRING },
+                        texto: { type: Type.STRING }
+                      },
+                      required: ["slide_numero", "titulo", "texto"]
+                    }
+                  },
+                  devocional: {
+                    type: Type.OBJECT,
+                    properties: {
+                      titulo: { type: Type.STRING },
+                      versiculo_base: { type: Type.STRING },
+                      reflexao: { type: Type.STRING },
+                      oracao_guiada: { type: Type.STRING }
+                    },
+                    required: ["titulo", "versiculo_base", "reflexao", "oracao_guiada"]
+                  },
+                  legenda_instagram: { type: Type.STRING }
                 },
-                required: ["titulo", "versiculo_base", "reflexao", "oracao_guiada"]
-              },
-              legenda_instagram: { type: Type.STRING }
-            },
-            required: ["linha_do_tempo", "carrossel", "devocional", "legenda_instagram"]
+                required: ["linha_do_tempo", "carrossel", "devocional", "legenda_instagram"]
+              }
+            }
+          });
+
+          const responseText = response.text || "";
+          const parsed = JSON.parse(responseText.trim());
+          
+          return parsed;
+      } finally {
+          if (uploadedFileRef) {
+            try {
+               await client.files.delete({ name: uploadedFileRef.name });
+               console.log(`Deleted file from Gemini: ${uploadedFileRef.name}`);
+            } catch(e) { console.error("Error deleting file from Gemini", e); }
           }
-        }
-      });
-
-      const responseText = response.text || "";
-      const parsed = JSON.parse(responseText.trim());
-      
-      // Salva localmente se estiver no ambiente de desenvolvimento
-      if (process.env.NODE_ENV !== "production") {
-        try {
-          const dir = path.dirname(dataPath);
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-          fs.writeFileSync(dataPath, JSON.stringify(parsed, null, 2));
-          console.log(`Saved latest generated sermon to ${dataPath}`);
-        } catch (e) {
-          console.error("Failed to save sermon locally:", e);
-        }
+          if (tempAudioPath && fs.existsSync(tempAudioPath)) {
+            try {
+               fs.unlinkSync(tempAudioPath);
+               console.log(`Deleted local temp file: ${tempAudioPath}`);
+            } catch(e) { console.error("Error deleting local file", e); }
+          }
       }
+  }
 
+  // API Route: Get latest pre-calculated sermon
+  app.get("/api/latest-sermon", async (req, res) => {
+    try {
+      const saved = await getSavedSermon();
+      if (saved) {
+        return res.json(saved);
+      }
+      return res.status(404).json({ error: "Sermão não processado." });
+    } catch (err) {
+      console.error("Error fetching latest sermon", err);
+      return res.status(500).json({ error: "Erro ao buscar último sermão" });
+    }
+  });
+
+  // API Route: Analyze Sermon (Manual Trigger)
+  app.post("/api/analyze-sermon", async (req, res) => {
+    let { text, videoId, vibe } = req.body;
+    
+    if (!text && !videoId) {
+      return res.status(400).json({ error: "Sermon text or videoId is required" });
+    }
+
+    try {
+      const parsed = await generateSermonAnalysisCore(videoId, text, vibe);
+      
+      // Save it unconditionally
+      if (videoId) parsed.videoId = videoId;
+      await saveSermon(parsed);
+      
       return res.json(parsed);
-
     } catch (error: any) {
       console.error("Gemini analysis error:", error);
       return res.status(500).json({
@@ -224,6 +299,53 @@ O formato exato em JSON deve ser:
         details: error?.message || "Erro interno do servidor."
       });
     }
+  });
+
+  // API Route: Cron Job Hook
+  app.post("/api/cron/analyze", async (req, res) => {
+     try {
+       // Optional: Basic Auth or Token checking
+       const cronToken = req.headers['x-cron-token'] || req.query.token;
+       if (process.env.CRON_TOKEN && cronToken !== process.env.CRON_TOKEN) {
+          return res.status(401).json({ error: "Unauthorized" });
+       }
+       
+       // 1. Get latest live video ID
+       const API_KEY = process.env.VITE_YOUTUBE_API_KEY;
+       const CHANNEL_ID = process.env.VITE_YOUTUBE_CHANNEL_ID;
+       let videoId = null;
+
+       if (API_KEY && CHANNEL_ID) {
+          const ytRes = await fetch(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&order=date&type=video&maxResults=1&key=${API_KEY}`
+          );
+          const ytData = await ytRes.json();
+          if (ytData.items && ytData.items.length > 0) {
+            videoId = ytData.items[0].id.videoId;
+          }
+       }
+
+       if (!videoId) {
+         return res.json({ status: "skipped", message: "Nenhum vídeo recente encontrado no YouTube." });
+       }
+
+       // 2. Check if already processed
+       const saved = await getSavedSermon();
+       if (saved && saved.videoId === videoId) {
+          return res.json({ status: "skipped", message: "Último vídeo já foi processado." });
+       }
+
+       // 3. Process
+       console.log(`Cron triggered for video: ${videoId}`);
+       const parsed = await generateSermonAnalysisCore(videoId);
+       parsed.videoId = videoId;
+       await saveSermon(parsed);
+
+       return res.json({ status: "success", videoId });
+     } catch (err: any) {
+       console.error("Cron Error:", err);
+       return res.status(500).json({ status: "error", error: err.message });
+     }
   });
 
   // Hot module replacement or static server

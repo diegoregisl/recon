@@ -6,9 +6,7 @@ export default function LiveStream() {
   const [loading, setLoading] = useState(true);
   
   // AI States
-  const [isGenerating, setIsGenerating] = useState(false);
   const [aiSummary, setAiSummary] = useState<any>(null);
-  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLiveStream = async () => {
@@ -29,40 +27,27 @@ export default function LiveStream() {
       }
     };
 
+    const fetchLatestSermon = async () => {
+      try {
+        const response = await fetch("/api/latest-sermon");
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.devocional) {
+            setAiSummary(data);
+          }
+        }
+      } catch (err) {
+        console.error("No cached sermon available yet", err);
+      }
+    };
+
     fetchLiveStream();
+    fetchLatestSermon();
     
     // Atualiza a cada 5 minutos
     const interval = setInterval(fetchLiveStream, 300000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleGenerateSummary = async () => {
-    if (!liveVideoId) return;
-    
-    setIsGenerating(true);
-    setAiError(null);
-    setAiSummary(null);
-
-    try {
-      const response = await fetch("/api/analyze-sermon", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId: liveVideoId })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || "Ocorreu um erro desconhecido ao analisar o vídeo.");
-      }
-      
-      setAiSummary(data);
-    } catch (err: any) {
-      setAiError(err.message);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   return (
     <div id="recon-livestream-card" className="bg-[#1e1e24] rounded-2xl overflow-hidden shadow-lg border border-white/5 relative flex flex-col">
@@ -104,46 +89,21 @@ export default function LiveStream() {
       {/* Seção de IA - Aparece logo abaixo do vídeo se tiver um vídeo carregado */}
       {liveVideoId && (
         <div className="p-4 bg-[#1a1a20] border-t border-white/5 flex-1 flex flex-col">
-          {!aiSummary && !isGenerating && (
-            <button
-              onClick={handleGenerateSummary}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl text-white text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              Gerar Resumo do Culto com IA
-            </button>
-          )}
-
-          {isGenerating && (
-            <div className="flex flex-col items-center justify-center py-6 gap-3">
-              <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
-              <p className="text-xs text-gray-400 text-center px-4">
-                A Inteligência Artificial está assistindo ao culto e extraindo os pontos principais... <br/> (Isso pode levar alguns segundos)
-              </p>
-            </div>
-          )}
-
-          {aiError && (
-            <div className="bg-red-950/30 border border-red-500/30 rounded-xl p-4 text-center mt-2">
-              <p className="text-xs text-red-400 font-semibold mb-1">Ops, algo deu errado!</p>
-              <p className="text-[10px] text-gray-400">{aiError}</p>
-              <button onClick={handleGenerateSummary} className="mt-3 text-[10px] bg-red-900/50 hover:bg-red-900 px-3 py-1.5 rounded-md text-red-200">
-                Tentar Novamente
-              </button>
-            </div>
+          {!aiSummary && !loading && (
+             <div className="text-center py-6">
+                <Sparkles className="w-6 h-6 text-gray-600 mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-gray-500 font-medium">Os materiais teológicos deste culto estarão disponíveis em breve.</p>
+             </div>
           )}
 
           {/* Resultado da IA */}
-          {aiSummary && !isGenerating && (
+          {aiSummary && (
             <div className="space-y-4 mt-2 animate-fadeIn">
               <div className="flex items-center justify-between border-b border-white/5 pb-2">
                 <span className="text-[10px] uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Materiais Gerados
+                  Materiais de Estudo
                 </span>
-                <button onClick={() => setAiSummary(null)} className="text-[10px] text-gray-500 hover:text-white">
-                  Limpar
-                </button>
               </div>
 
               {/* Linha do Tempo do Culto */}
