@@ -79,7 +79,18 @@ export default function App() {
 
           {/* Quick trigger to admin/studio tab */}
           <button
-            onClick={() => setActiveTab(activeTab === "studio" ? "home" : "studio")}
+            onClick={() => {
+              if (activeTab !== "studio") {
+                const pwd = window.prompt("Senha de Acesso (Área Ministerial):");
+                if (pwd === "recon123") {
+                  setActiveTab("studio");
+                } else if (pwd !== null) {
+                  alert("Senha incorreta.");
+                }
+              } else {
+                setActiveTab("home");
+              }
+            }}
             className="w-8 h-8 rounded-lg bg-[#1e1e24] hover:bg-zinc-800 border border-white/5 flex items-center justify-center text-blue-400 group cursor-pointer transition relative z-10"
             title="Estúdio de Mídia"
           >
@@ -222,9 +233,20 @@ export default function App() {
             <Home className="w-5.5 h-5.5" />
           </button>
 
-          {/* Tab 2: Media Studio Button */}
+          {/* Tab 2: Media Studio Button (Protected) */}
           <button
-            onClick={() => setActiveTab("studio")}
+            onClick={() => {
+              if (activeTab !== "studio") {
+                const pwd = window.prompt("Senha de Acesso (Área Ministerial):");
+                if (pwd === "recon123") {
+                  setActiveTab("studio");
+                } else if (pwd !== null) {
+                  alert("Senha incorreta.");
+                }
+              } else {
+                setActiveTab("home");
+              }
+            }}
             className={`flex flex-col items-center justify-center cursor-pointer outline-none relative transition-all duration-200 ${
               activeTab === "studio" ? "text-[#3b82f6] scale-110" : "text-gray-500 hover:text-white"
             }`}
