@@ -1,7 +1,7 @@
 FROM node:20-slim
 
 # Install necessary tools for yt-dlp to work (it needs python3 and ffmpeg to extract audio)
-RUN apt-get update && apt-get install -y python3 ffmpeg curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 python-is-python3 ffmpeg curl && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
