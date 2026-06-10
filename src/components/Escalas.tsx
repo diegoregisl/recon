@@ -40,7 +40,7 @@ const membrosEquipes: Record<string, string[]> = {
   // Multimídia
   "Equipe Tati": ["Nicolas", "Renata", "Natasha", "Iago", "Samuel"],
   "Equipe Carol": ["Renato", "Cassiane", "Carlos", "João", "Miguel"],
-  "Equipe Robson": ["José", "Nicole", "Celena", "Vitor", "Milena"]
+  "Equipe Robson": ["Robson", "José", "Nicole Freitas", "Celena", "Vítor Hugo", "Ane Nicole"]
 };
 
 export default function Escalas() {
