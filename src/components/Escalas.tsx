@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Music, MonitorPlay, Mic2, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { Calendar, Music, MonitorPlay, Mic2, ChevronDown, ChevronUp, Filter, X } from "lucide-react";
 import escalasData from "../data/escalasData.json";
 
 type Escala = {
@@ -19,9 +19,34 @@ const mesesNomes: Record<string, string> = {
   "OUT": "Outubro", "NOV": "Novembro", "DEZ": "Dezembro", "JAN": "Janeiro (2027)"
 };
 
+const membrosJovemA = ["Miquéias", "João", "Vanessa", "Milena", "Cassiane", "Renata", "Renato", "Gabriel"];
+const membrosJovemB = ["Raylan", "Thiago U.", "Gabi", "Tabita", "Natasha", "Jéssica M.", "Samuel"];
+
+const membrosEquipes: Record<string, string[]> = {
+  // Louvor
+  "Equipe Felipe": ["Vanessa", "Gabriela", "Cassiane", "Jéssica M.", "Alexandre", "Thiago U.", "Renato", "João"],
+  "Equipe Wesley": ["Jéssica C.", "Milena", "Renata", "Natasha", "Maurício", "Miquéias", "Samuel", "Douglas"],
+  "Equipe Lorrane": ["Tabita", "Thalita", "Amanda", "Raylan", "Beto", "Diego R."],
+  "Coral de Mulheres": ["Integrantes não listados. Em breve!"],
+  
+  // Louvor GPS (Sábado)
+  "Equipe Felipe (GPS A)": ["Felipe (Líder)", ...membrosJovemA],
+  "Equipe Felipe (GPS B)": ["Felipe (Líder)", ...membrosJovemB],
+  "Equipe Wesley (GPS A)": ["Wesley (Líder)", ...membrosJovemA],
+  "Equipe Wesley (GPS B)": ["Wesley (Líder)", ...membrosJovemB],
+  "Equipe Lorrane (GPS A)": ["Lorrane (Líder)", ...membrosJovemA],
+  "Equipe Lorrane (GPS B)": ["Lorrane (Líder)", ...membrosJovemB],
+
+  // Multimídia
+  "Equipe Tati": ["Nicolas", "Renata", "Natasha", "Iago", "Samuel"],
+  "Equipe Carol": ["Renato", "Cassiane", "Carlos", "João", "Miguel"],
+  "Equipe Robson": ["José", "Nicole", "Celena", "Vitor", "Milena"]
+};
+
 export default function Escalas() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [selectedMonth, setSelectedMonth] = useState<string>("FEV");
+  const [selectedTeam, setSelectedTeam] = useState<{nome: string; membros: string[]} | null>(null);
 
   useEffect(() => {
     const today = new Date();
@@ -131,7 +156,16 @@ export default function Escalas() {
                       </div>
                       <div className="text-xs">
                         <span className="text-gray-500 uppercase tracking-widest text-[9px] block">Louvor</span>
-                        <span className="text-gray-200 font-medium">{escala.louvor}</span>
+                        {membrosEquipes[escala.louvor] ? (
+                          <span 
+                            onClick={() => setSelectedTeam({ nome: escala.louvor, membros: membrosEquipes[escala.louvor] })}
+                            className="text-blue-400 font-medium cursor-pointer underline decoration-blue-500/30 underline-offset-2 hover:text-blue-300 transition"
+                          >
+                            {escala.louvor}
+                          </span>
+                        ) : (
+                          <span className="text-gray-200 font-medium">{escala.louvor}</span>
+                        )}
                       </div>
                     </div>
 
@@ -142,7 +176,16 @@ export default function Escalas() {
                       </div>
                       <div className="text-xs">
                         <span className="text-gray-500 uppercase tracking-widest text-[9px] block">Multimídia</span>
-                        <span className="text-gray-200 font-medium">{escala.multimidia}</span>
+                        {membrosEquipes[escala.multimidia] ? (
+                          <span 
+                            onClick={() => setSelectedTeam({ nome: escala.multimidia, membros: membrosEquipes[escala.multimidia] })}
+                            className="text-pink-400 font-medium cursor-pointer underline decoration-pink-500/30 underline-offset-2 hover:text-pink-300 transition"
+                          >
+                            {escala.multimidia}
+                          </span>
+                        ) : (
+                          <span className="text-gray-200 font-medium">{escala.multimidia}</span>
+                        )}
                       </div>
                     </div>
 
@@ -170,6 +213,30 @@ export default function Escalas() {
           );
         })}
       </div>
+
+      {/* Modal de Integrantes da Equipe */}
+      {selectedTeam && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-[#1e1e24] w-full max-w-xs rounded-2xl border border-white/10 shadow-2xl overflow-hidden animate-slideUp">
+            <div className="flex items-center justify-between p-4 border-b border-white/5 bg-[#111115]">
+              <h3 className="font-bold text-white text-sm">{selectedTeam.nome}</h3>
+              <button onClick={() => setSelectedTeam(null)} className="text-gray-400 hover:text-white transition">
+                 <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+              <ul className="space-y-2.5">
+                 {selectedTeam.membros.map(m => (
+                   <li key={m} className="text-xs text-gray-300 flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <span className="font-medium tracking-wide">{m}</span>
+                   </li>
+                 ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

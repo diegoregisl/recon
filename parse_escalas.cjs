@@ -18,7 +18,8 @@ const louvorDomingo = {
 
 const louvorSabado = {
   dates: "21/fev; 21/mar; 18/abr; 16/mai; 20/jun; 18/jul; 15/ago; 19/set; 17/out; 21/nov; -; -",
-  equipes: "Wesley; Lorrane; Wesley; Felipe; Wesley; Lorrane; Felipe; Wesley; Lorrane; Wesley; -; Lorrane"
+  equipes: "Wesley; Lorrane; Wesley; Felipe; Wesley; Lorrane; Felipe; Wesley; Lorrane; Wesley; -; Lorrane",
+  gpsAB: "A; B; A; B; A; B; A; B; A; B; -; B"
 };
 
 const multiSexta = {
@@ -125,7 +126,9 @@ for (let mIndex = 0; mIndex < 12; mIndex++) {
       louvor = (louvorDomMap[monthName][day]) ? "Equipe " + louvorDomMap[monthName][day] : "-";
       multimidia = (multiDomMap[monthName][day]) ? "Equipe " + multiDomMap[monthName][day] : "-";
     } else if (diaSemana === "Sábado") {
-      louvor = "Equipe " + louvorSabado.equipes.split(';')[mIndex].trim();
+      const equipeSbd = louvorSabado.equipes.split(';')[mIndex].trim();
+      const abSbd = louvorSabado.gpsAB.split(';')[mIndex].trim();
+      louvor = equipeSbd !== "-" ? "Equipe " + equipeSbd + " (GPS " + abSbd + ")" : "-";
       multimidia = "Equipe " + multiSabado.equipes.split(';')[mIndex].trim();
     }
     
