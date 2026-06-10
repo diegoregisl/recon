@@ -4,6 +4,7 @@ import { SermonAnalysisResult, CarouselSlide } from "../types";
 
 export default function SermonAssistant() {
   const [sermonText, setSermonText] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [vibe, setVibe] = useState("Edificante & Prático");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -29,7 +30,7 @@ export default function SermonAssistant() {
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!sermonText.trim()) return;
+    if (!sermonText.trim() && !videoUrl.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -43,10 +44,17 @@ export default function SermonAssistant() {
     }, 1800);
 
     try {
+      let extractedVideoId = null;
+      if (videoUrl.trim()) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = videoUrl.trim().match(regExp);
+        extractedVideoId = (match && match[2].length === 11) ? match[2] : videoUrl.trim();
+      }
+
       const response = await fetch("/api/analyze-sermon", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: sermonText, vibe })
+        body: JSON.stringify({ text: sermonText, videoId: extractedVideoId, vibe })
       });
 
       if (!response.ok) {
@@ -74,6 +82,7 @@ export default function SermonAssistant() {
   };
 
   const loadSampleSermon = () => {
+    setVideoUrl("https://www.youtube.com/watch?v=3ACwaoXbKVc");
     setSermonText(
       "Sermão deste Culto de Celebração:\nTema: A Coragem de Dar o Primeiro Passo para a Restauração.\nTexto Base: Lucas 15 - A parábola do filho pródigo que decide voltar ao pai.\n\nPrincipais tópicos do Pastor:\n1. O orgulho nos afasta das pessoas e da presença de Deus. O filho pródigo reivindica a herança e vai herdar um deserto. Muitas vezes corremos atrás de prazeres imediatos que dissolvem nosso propósito espiritual na terra.\n2. O arrependimento começa na mente e exige uma atitude física. O texto diz 'caindo em si, ele diz: vou levantar-me e ir para o meu pai'. Foram necessários quilômetros de caminhada de volta ao lar.\n3. O Pai nunca deixou de esperar e olhar para o horizonte. Ao avistar o filho de longe, Ele correu e o abraçou. A cruz é a prova cabal de que o amor restaura, conforta e reorganiza nossa mente. Não precisamos ficar envergonhados pelas falhas de ontem, pois em Cristo iniciamos uma nova história.\n4. O ministério da reconciliação é colocar anéis nos dedos de quem estava quebrado e fazer banquetes onde antes havia sofrimento."
     );
@@ -104,13 +113,24 @@ export default function SermonAssistant() {
       {!result && !loading && (
         <form onSubmit={handleAnalyze} className="space-y-4">
           <div className="space-y-2">
+            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest">Link do Culto no YouTube</label>
+            <input
+              type="text"
+              placeholder="Ex: https://youtube.com/watch?v=..."
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="w-full bg-[#111115] text-[#f4f4f5] text-xs p-3.5 rounded-xl border border-white/5 outline-none focus:border-[#3b82f6] placeholder-gray-650"
+            />
+          </div>
+
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest">Sermão / Transcrição</label>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest">Sermão / Transcrição (Opcional)</label>
               <span className="text-[10px] text-gray-500 font-sans">Forneça esboço ou anotações</span>
             </div>
             <textarea
-              required
-              rows={5}
+              required={!videoUrl.trim()}
+              rows={4}
               placeholder="Cole aqui o texto do sermão, esboço do pastor, transcrição do áudio ou pontos cruciais do culto..."
               value={sermonText}
               onChange={(e) => setSermonText(e.target.value)}

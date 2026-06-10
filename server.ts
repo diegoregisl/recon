@@ -86,7 +86,7 @@ async function startServer() {
     
     if (!API_KEY || !CHANNEL_ID) {
       console.warn("YouTube keys missing on server.");
-      return res.json({ videoId: "3ACwaoXbKVc" }); // fallback
+      return res.json({ videoId: "3ACwaoXbKVc", isLive: false }); // fallback
     }
 
     try {
@@ -96,7 +96,7 @@ async function startServer() {
       const data = await response.json();
 
       if (data.items && data.items.length > 0) {
-        return res.json({ videoId: data.items[0].id.videoId });
+        return res.json({ videoId: data.items[0].id.videoId, isLive: true });
       }
 
       // Fallback: Last video
@@ -106,13 +106,13 @@ async function startServer() {
       const fallbackData = await fallbackRes.json();
       
       if (fallbackData.items && fallbackData.items.length > 0) {
-        return res.json({ videoId: fallbackData.items[0].id.videoId });
+        return res.json({ videoId: fallbackData.items[0].id.videoId, isLive: false });
       }
 
-      return res.json({ videoId: "3ACwaoXbKVc" }); // ultimate fallback
+      return res.json({ videoId: "3ACwaoXbKVc", isLive: false }); // ultimate fallback
     } catch (error) {
       console.error("YouTube API error on server:", error);
-      return res.json({ videoId: "3ACwaoXbKVc" });
+      return res.json({ videoId: "3ACwaoXbKVc", isLive: false });
     }
   });
 
@@ -121,7 +121,7 @@ async function startServer() {
       let uploadedFileRef: any = null;
       const client = getGeminiClient();
 
-      if (videoId) {
+      if (videoId && (!text || text.trim() === "")) {
         try {
           console.log(`Fetching transcript for videoId: ${videoId}`);
           const transcript = await YoutubeTranscript.fetchTranscript(videoId);

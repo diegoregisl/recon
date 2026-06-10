@@ -1,62 +1,67 @@
 {
   "linha_do_tempo": [
     {
-      "fase": "Abertura e Testemunho",
-      "descricao": "Abertura com oração e testemunho de Vanessa baseado em Salmos 69:33 sobre a providência divina na viagem de sua irmã."
+      "fase": "Abertura do Culto",
+      "descricao": "Início do culto com saudações da Ceia do Senhor, anunciando a morte e ressurreição de Cristo. Foi realizada a leitura bíblica de Salmo 133, enfatizando a união fraternal, seguida de uma oração de consagração e súplica pela comunhão da igreja."
     },
     {
       "fase": "Momento de Louvor",
-      "descricao": "Período de adoração congregacional com cânticos ao Espírito Santo, além de Hosana nas Alturas e Grande é o Nome do Senhor."
+      "descricao": "A congregação adorou a Deus com cânticos de vitória, iniciando com a música 'Leão de Judá Prevaleceu'. Na sequência, houve a calorosa recepção aos visitantes e o louvor 'Eu vejo a glória do Senhor hoje aqui', marcando um ambiente de grande júbilo e quebrantamento."
     },
     {
-      "fase": "Dízimos e Ofertas",
-      "descricao": "Breve reflexão e consagração dos dízimos e ofertas, com foco no princípio bíblico da gratidão e do senhorio de Cristo."
+      "fase": "Ofertório",
+      "descricao": "Consagração dos dízimos, ofertas e primícias. Foi feita a leitura de Malaquias 3:10 e ministrada uma oração de provisão, abençoando as famílias e abrindo caminhos para os desempregados. Durante as ofertas, ministrou-se a música 'Este é o meu respirar'."
     },
     {
-      "fase": "Oração pelas Famílias",
-      "descricao": "Momento de intercessão em círculo clâmando por cura, libertação de vícios e restauração dos lares, entoando a canção Deus de Milagres."
+      "fase": "Pedidos de Oração e Intercessão",
+      "descricao": "Comunidade reuniu-se em pé para interceder pelos necessitados. O pastor fez a leitura de Salmo 143:1 e clamou intensamente pela caixa de pedidos de oração, focando em cura de enfermidades físicas e espirituais, restauração familiar e clamor pela nossa nação."
     },
     {
-      "fase": "Pregação da Palavra",
-      "descricao": "Mensagem principal baseada em Atos 16:31-34 sobre o tema das famílias salvas na Bíblia, citando os exemplos de Noé, Ló, Eli, Páscoa, Raabe e o carcereiro de Filipos."
+      "fase": "Pregação Principal",
+      "descricao": "O pastor ministrou uma mensagem expositiva e profunda centrada em Filemon 1:17. O tema principal abordou a necessidade de receber as pessoas com amor prático e liberar o perdão diante das ofensas e dos prejuízos materiais sofridos, trazendo exemplos bíblicos como os de Jesus, Estêvão, Eliseu e Zaqueu."
     },
     {
-      "fase": "Avisos e Encerramento",
-      "descricao": "Comunicações sobre o Desafio Jovem, Jantar de Casais e Acampamento GPS, seguidos pela oração de encerramento e bênção apostólica."
+      "fase": "Celebração da Ceia",
+      "descricao": "A pastora assumiu a condução do memorial da Ceia do Senhor baseando-se em 1 Coríntios 11:23-28. Após um momento de autoexame e confissão de pecados, os elementos do pão e do cálice foram consagrados e distribuídos sob o canto de 'Jesus Messias', com um ato profético de troca de cálices entre irmãos simbolizando a nova aliança."
+    },
+    {
+      "fase": "Clamor Final e Avisos",
+      "descricao": "A igreja uniu-se em oração de mãos dadas clamando por perdão, reconciliação e quebra do orgulho. Logo após, foram dados os avisos sobre o Jantar de Casais (20 de junho), o Acampamento de Jovens com o tema 'Influenciadores transformados para transformar' (23 a 25 de outubro), a Vigília dos Namorados (12 de junho) e o Bazar de sábado. O irmão Roberto encerrou com a oração de bênção apostólica."
     }
   ],
   "carrossel": [
     {
       "slide_numero": 1,
-      "titulo": "Salvação Para Sua Casa",
-      "texto": "Deus não deseja resgatar apenas você, mas estender a Sua graça salvadora a todo o seu lar."
+      "titulo": "O Desafio de Acolher",
+      "texto": "Assim como Paulo apelou a Filemon, somos chamados a receber uns aos outros com o mesmo amor com que fomos recebidos por Deus."
     },
     {
       "slide_numero": 2,
-      "titulo": "O Legado de Noé",
-      "texto": "Pela fé e obediência fiel, Noé preparou a arca que salvou toda a sua família da destruição."
+      "titulo": "Amor Sem Distinção",
+      "texto": "O verdadeiro cristianismo se manifesta quando acolhemos o próximo de forma indistinta, sem preconceitos, divisões ou reservas."
     },
     {
       "slide_numero": 3,
-      "titulo": "Protegidos Pelo Sangue Santo",
-      "texto": "Na Páscoa, a cobertura do sangue do cordeiro guardou as famílias, apontando para o sacrifício de Jesus."
+      "titulo": "Liberar Perdão Cura",
+      "texto": "Perdoar quem nos ofendeu ou causou prejuízo não é um processo simples, mas é a marca inconfundível do verdadeiro discípulo de Jesus."
     },
     {
       "slide_numero": 4,
-      "titulo": "Uma Fé que Alcança",
-      "texto": "Do carcereiro de Filipos ao centurião Cornélio, quando o cabeça do lar crê, a salvação entra na casa."
+      "titulo": "A Medida do Perdão",
+      "texto": "Cristo nos convida a perdoar 'setenta vezes sete'. Se o Pai Celestial nos perdoou de uma dívida eterna, devemos estender a mesma graça aos outros."
     },
     {
       "slide_numero": 5,
-      "titulo": "Decisão de se Posicionar",
-      "texto": "Siga o exemplo de Josué e firme um compromisso eterno: Eu e a minha casa serviremos ao Senhor."
+      "titulo": "Comunhão na Luz",
+      "texto": "Se andarmos na luz, como Ele na luz está, temos comunhão mútua e o sangue de Jesus nos purifica de toda barreira espiritual."
     }
   ],
   "devocional": {
-    "titulo": "O Projeto Divino da Salvação Familiar",
-    "versiculo_base": "Atos 16:31",
-    "reflexao": "O plano de redenção estabelecido por Deus nunca foi individualista. Desde a aliança com Abraão, passando pela arca de Noé até a cobertura do cordeiro pascal nas casas no Egito, o Senhor sempre revelou Seu coração focado em abençoar a família como um todo. Quando entregamos nossa vida a Cristo, tornamo-nos canais de bênção para que a luz do Evangelho alcance e dissipe as trevas que tentam assolar os nossos lares. Na caminhada prática, assumir a responsabilidade espiritual pela nossa casa é um chamado inegociável. A herança de fé que deixamos para as próximas gerações depende de nosso posicionamento em oração e obediência. Como vemos na história de Raabe e do carcereiro de Filipos, a conversão e o temor de uma só pessoa podem abrir as portas da salvação e mudar o destino de toda uma parentela. Portanto, continue perseverando em favor daqueles que você ama, mesmo quando as circunstâncias parecerem difíceis. A promessa de salvação para a sua casa é uma âncora de esperança. Firme os seus pés na verdade bíblica, exerça a autoridade espiritual no seu lar e confie no poder restaurador do Espírito Santo, que é poderoso para fazer infinitamente mais do que pedimos ou pensamos.",
-    "oracao_guiada": "Senhor Deus, coloco a minha família em Teu altar. Fortalece a minha fé para que eu continue intercedendo pela salvação e libertação de cada um dos meus entes queridos. Que o Teu Espírito traga cura e restauração sobre o meu lar. Declaramos que eu e a minha casa serviremos ao Senhor. Amém."
+    "titulo": "Acolhimento e Perdão: As Marcas da Reconciliação",
+    "versiculo_base": "Filemon 1:17 - \"Assim, pois se me tens por companheiro, recebe-o como a mim mesmo.\"",
+    "reflexao": "A carta de Paulo a Filemon nos apresenta um dos maiores dramas humanos e espirituais: a reconciliação entre um senhor ofendido e seu servo devedor fugitivo, Onésimo. Paulo não roga que a lei seja aplicada rigidamente, mas que o amor e a graça prevaleçam. Ele desafia Filemon a receber o antigo devedor não mais como escravo, mas como irmão amado, assumindo ele mesmo qualquer prejuízo financeiro. Esse convite ao acolhimento é o reflexo exato do evangelho que nos alcançou: Cristo assumiu nossas dívidas para que fôssemos recebidos pelo Pai.\n\nNa vida prática do cristão, acolher e perdoar não são sugestões opcionais, mas provas reais de nossa filiação com Deus. Quando liberamos perdão, nosso ego é confrontado e nossa moral é colocada à prova, porém, é nesse exato momento que experimentamos a cura espiritual. Jesus condicionou o perdão do Pai à nossa disposição de perdoar o próximo. Portanto, o verdadeiro teste de maturidade espiritual não está em nossas belas palavras, mas na nossa capacidade de estender a mão a quem falhou conosco, promovendo a paz e a união no corpo de Cristo.\n\nPara que haja comunhão genuína e cura em nosso meio, precisamos andar na luz. Se retivermos ressentimentos contra irmãos, líderes ou familiares, bloqueamos o fluir da graça em nossas vidas. A verdadeira reconciliação exige ação: acolher sem discriminação e perdoar sem reservas, lembrando-nos de que fomos perdoados de uma dívida infinitamente maior. Que possamos hoje abrir nossos corações para viver essa dimensão de amor prático que limpa a alma e une a igreja.",
+    "oracao_guiada": "Senhor Deus, reconhecemos que perdoar e acolher quem nos feriu é um grande desafio para o nosso ego. Mas, lembrando do Teu imenso sacrifício na cruz, pedimos que o Teu Espírito Santo nos dê forças para liberar perdão e restaurar relacionamentos. Limpa nosso coração de toda mágoa e ressentimento para que andemos em plena luz e comunhão. Em nome de Jesus, amém."
   },
-  "legenda_instagram": "Deus tem um plano perfeito de salvação e restauração para a sua família! No culto deste domingo, fomos profundamente ministrados de que a promessa de Atos 16:31 se estende a todos os nossos entes queridos. Da arca de Noé à casa do carcereiro de Filipos, a graça de Deus sempre busca resgatar lares inteiros através de uma fé ativa e obediente. Não importa quão difíceis pareçam as lutas em sua casa hoje, o Senhor é o Deus de milagres e poderoso para transformar a sua história. Continue orando e se posicionando espiritualmente! Pergunta para meditarmos juntos: qual o nome daquele familiar que você está apresentando a Deus em oração nesta semana? Escreva aqui nos comentários para intercedermos juntos por ele! #IgrejaRecon #MinisterioDaReconciliacao #SalvaçãoFamiliar #Fé #OraçãoPelaFamília #DeusDeMilagres"
+  "legenda_instagram": "Acolher com amor e liberar perdão não são tarefas fáceis, mas são as maiores evidências de que fomos de fato alcançados pelo Evangelho de Jesus Cristo. Na pregação deste domingo, fomos profundamente desafiados a olhar para a história de Filemon e Onésimo e aprender que a nossa conduta cristã é colocada à prova nos momentos em que decidimos perdoar as ofensas e prejuízos que sofremos. Afinal, se o Pai nos perdoou de uma dívida impagável, como podemos reter a graça ao nosso irmão? Que possamos caminhar na luz, desfrutando de comunhão sincera e de um coração livre de amarguras.\n\n👉 Há alguém que você precisa acolher ou liberar perdão hoje para experimentar a verdadeira cura?\n\n#IgrejaRecon #MinisterioDaReconciliacao #PerdaoEAmor #VidaComDeus #Comunhao #CultoDeCeia #Filemon",
+  "videoId": "PRNkXqpP7GY"
 }

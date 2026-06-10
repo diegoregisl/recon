@@ -16,14 +16,34 @@ import {
   Signal,
   Wifi,
   Battery,
-  Facebook
+  Facebook,
+  Radio,
+  Calendar
 } from "lucide-react";
-import LiveStream from "./components/LiveStream";
+import AnalyzedSermon from "./components/AnalyzedSermon";
+import LiveStreamPlayer from "./components/LiveStreamPlayer";
 
 import SermonAssistant from "./components/SermonAssistant";
+import Escalas from "./components/Escalas";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "studio" | "about">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "studio" | "about" | "live" | "escalas">("home");
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    const checkLive = async () => {
+      try {
+        const res = await fetch("/api/live-video");
+        const data = await res.json();
+        setIsLive(!!data.isLive);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    checkLive();
+    const interval = setInterval(checkLive, 300000);
+    return () => clearInterval(interval);
+  }, []);
   const [systime, setSystime] = useState("10:00");
 
   // Keep a mock local smartphone clock updated
@@ -123,10 +143,26 @@ export default function App() {
                     Mensagem da Semana
                   </h3>
                 </div>
-                <LiveStream />
+                <AnalyzedSermon />
               </div>
 
               {/* QuickActions e EventsList foram removidos para limpeza do MVP */}
+            </div>
+          )}
+
+          {/* --- TAB LIVE: CULTO AO VIVO --- */}
+          {activeTab === "live" && isLive && (
+            <div id="tab-content-live" className="space-y-6 animate-fadeIn">
+              <div className="bg-red-950/30 border border-red-500/20 p-3.5 rounded-2xl flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 shrink-0 animate-pulse">
+                  <Radio className="w-4.5 h-4.5 text-red-500" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white">Estamos Ao Vivo</h4>
+                  <p className="text-[10px] text-gray-400 font-sans">Acompanhe nossa transmissão em tempo real.</p>
+                </div>
+              </div>
+              <LiveStreamPlayer />
             </div>
           )}
 
@@ -145,6 +181,11 @@ export default function App() {
 
               <SermonAssistant />
             </div>
+          )}
+
+          {/* --- TAB ESCALAS: ESCALAS MINISTERIAIS --- */}
+          {activeTab === "escalas" && (
+            <Escalas />
           )}
 
           {/* --- TAB 3: ABOUT CHURCH PROFILE --- */}
@@ -233,6 +274,18 @@ export default function App() {
             <Home className="w-5.5 h-5.5" />
           </button>
 
+          {/* Tab Ao Vivo (Conditional) */}
+          {isLive && (
+            <button
+              onClick={() => setActiveTab("live")}
+              className={`flex flex-col items-center justify-center cursor-pointer outline-none relative transition-all duration-200 ${
+                activeTab === "live" ? "text-red-500 scale-110" : "text-gray-500 hover:text-red-400"
+              }`}
+            >
+              <Radio className="w-5.5 h-5.5 animate-pulse" />
+            </button>
+          )}
+
           {/* Tab 2: Media Studio Button (Protected) */}
           <button
             onClick={() => {
@@ -252,6 +305,27 @@ export default function App() {
             }`}
           >
             <Sparkles className="w-5.5 h-5.5" />
+          </button>
+
+          {/* Tab Escalas Button (Protected) */}
+          <button
+            onClick={() => {
+              if (activeTab !== "escalas") {
+                const pwd = window.prompt("Senha de Acesso (Escalas):");
+                if (pwd === "escalas123") {
+                  setActiveTab("escalas");
+                } else if (pwd !== null) {
+                  alert("Senha incorreta.");
+                }
+              } else {
+                setActiveTab("home");
+              }
+            }}
+            className={`flex flex-col items-center justify-center cursor-pointer outline-none relative transition-all duration-200 ${
+              activeTab === "escalas" ? "text-[#3b82f6] scale-110" : "text-gray-500 hover:text-white"
+            }`}
+          >
+            <Calendar className="w-5.5 h-5.5" />
           </button>
 
           {/* Tab 3: About Button */}
